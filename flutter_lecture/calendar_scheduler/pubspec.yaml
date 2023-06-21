@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   table_calendar: ^3.0.9
   intl: ^0.18.1
+  get_it: ^7.6.0
 
   ### drift dependency
   drift: ^2.8.2

@@ -7,7 +7,11 @@ class CustomTextField extends StatelessWidget {
   final bool isTime;
   final FormFieldSetter<String> onSaved;
 
-  const CustomTextField({required this.isTime, required this.label, required this.onSaved, Key? key})
+  const CustomTextField(
+      {required this.isTime,
+      required this.label,
+      required this.onSaved,
+      Key? key})
       : super(key: key);
 
   @override
@@ -21,8 +25,8 @@ class CustomTextField extends StatelessWidget {
             label,
             style: TextStyle(color: PRIMARY_COLOR, fontWeight: FontWeight.w600),
           ),
-          if(isTime) renderTextfield(),
-          if(!isTime) Expanded(child: renderTextfield())
+          if (isTime) renderTextfield(),
+          if (!isTime) Expanded(child: renderTextfield())
         ],
       ),
     );
@@ -32,22 +36,22 @@ class CustomTextField extends StatelessWidget {
     return TextFormField(
       onSaved: onSaved,
       // null이 리턴되면 에러가 없다.
-      validator: (String? val){
-        if(val == null || val.isEmpty){
+      validator: (String? val) {
+        if (val == null || val.isEmpty) {
           return "값을 입력해주세요.";
         }
 
-        if(isTime){
+        if (isTime) {
           int time = int.parse(val!);
 
-          if(time<0){
+          if (time < 0) {
             return "0 이상의 숫자를 입력해주세요.";
           }
-          if(time>24){
+          if (time > 24) {
             return "24 이하의 숫자를 입력해주세요.";
           }
-        }else{
-          if(val.length > 500){
+        } else {
+          if (val.length > 500) {
             return "500자 이하의 글자를 입력해주세요.";
           }
         }
@@ -61,7 +65,10 @@ class CustomTextField extends StatelessWidget {
       keyboardType: isTime ? TextInputType.number : TextInputType.multiline,
       inputFormatters: isTime ? [FilteringTextInputFormatter.digitsOnly] : [],
       decoration: InputDecoration(
-          border: InputBorder.none, filled: true, fillColor: Colors.grey[300]),
+          border: InputBorder.none,
+          filled: true,
+          fillColor: Colors.grey[300],
+          suffixText: isTime ? "시" : null),
     );
   }
 }

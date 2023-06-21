@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:calendar_scheduler/database/schedule_with_color.dart';
 import 'package:calendar_scheduler/model/category_color.dart';
 import 'package:calendar_scheduler/model/schedule.dart';
 import 'package:drift/drift.dart';
@@ -9,10 +10,8 @@ import 'package:path_provider/path_provider.dart';
 
 part 'drift_database.g.dart';
 
-@DriftDatabase(
-  tables: [Schedules, CategoryColors]
-)
-class LocalDatabase extends _$LocalDatabase{
+@DriftDatabase(tables: [Schedules, CategoryColors])
+class LocalDatabase extends _$LocalDatabase {
   LocalDatabase() : super(_openConnection());
 
   Future<int> createSchedule(SchedulesCompanion data) =>
@@ -23,6 +22,27 @@ class LocalDatabase extends _$LocalDatabase{
 
   Future<List<CategoryColor>> getCategoryColors() =>
       select(categoryColors).get();
+
+  Future<int> removeSchedule(int id) =>
+      (delete(schedules)..where((tbl) => tbl.id.equals(id))).go();
+
+  Future<int> updateScheduleById(int id, SchedulesCompanion data){
+    return (update(schedules)..where((tbl) => tbl.id.equals(id))).write(data);
+  }
+
+  Stream<List<ScheduleWithColor>> watchSchedules(DateTime date) {
+    final query = select(schedules).join([
+      innerJoin(categoryColors, categoryColors.id.equalsExp(schedules.colorId))
+    ]);
+    query.where(schedules.date.equals(date));
+    query.orderBy([OrderingTerm.asc(schedules.startTime)]);
+
+    return query.watch().map((rows) => rows
+        .map((row) => ScheduleWithColor(
+            schedule: row.readTable(schedules),
+            categoryColor: row.readTable(categoryColors)))
+        .toList());
+  }
 
   @override
   int get schemaVersion => 1;
